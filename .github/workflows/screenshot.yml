@@ -34,6 +34,8 @@ jobs:
           git pull --rebase origin main
           git push origin main
 
-      - run: gh issue comment "${{ github.event.issue.number }}" --body "![screenshot](https://raw.githubusercontent.com/${{ github.repository }}/main/screenshots/${{ github.event.issue.number }}.png)"
+      - run: |
+          gh issue comment "${{ github.event.issue.number }}" --body "![screenshot](https://raw.githubusercontent.com/${{ github.repository }}/main/screenshots/${{ github.event.issue.number }}.png)"
+          gh issue close "${{ github.event.issue.number }}"
         env:
           GH_TOKEN: ${{ github.token }}
