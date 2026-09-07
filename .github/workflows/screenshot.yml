@@ -28,14 +28,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           mkdir -p screenshots
-          cp screenshot.png "screenshots/${{ github.event.issue.number }}.png"
+          cp screenshot.png "screenshots/${{ github.event.issue.number }}-${{ github.run_id }}.png"
           git add screenshots
           git commit -m "Add screenshot for #${{ github.event.issue.number }}"
           git pull --rebase origin main
           git push origin main
 
       - run: |
-          gh issue comment "${{ github.event.issue.number }}" --body "![screenshot](https://raw.githubusercontent.com/${{ github.repository }}/main/screenshots/${{ github.event.issue.number }}.png)"
+          gh issue comment "${{ github.event.issue.number }}" --body "![screenshot](https://raw.githubusercontent.com/${{ github.repository }}/main/screenshots/${{ github.event.issue.number }}-${{ github.run_id }}.png)"
           gh issue close "${{ github.event.issue.number }}"
         env:
           GH_TOKEN: ${{ github.token }}
