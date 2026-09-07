@@ -4,6 +4,7 @@ on:
     types: [opened, reopened]
 
 permissions:
+  contents: write
   issues: write
 
 jobs:
@@ -12,6 +13,8 @@ jobs:
     timeout-minutes: 10
     env:
       TARGET_URL: ${{ github.event.issue.title }}
+      GH_TOKEN: ${{ github.token }}
+      NAME: ${{ github.event.issue.number }}-${{ github.run_id }}.png
     steps:
       - uses: actions/checkout@v4
 
@@ -24,9 +27,7 @@ jobs:
       - run: node main.mjs
 
       - run: |
-          wget -qO gh.tar.gz https://github.com/cli/cli/releases/download/v2.100.0/gh_2.100.0_linux_amd64.tar.gz
-          tar xf gh.tar.gz
-          ./gh_2.100.0_linux_amd64/bin/gh issue comment "${{ github.event.issue.number }}" --body "$TARGET_URL" --attach ./screenshot.png
-          ./gh_2.100.0_linux_amd64/bin/gh issue close "${{ github.event.issue.number }}"
-        env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          cp screenshot.png "$NAME"
+          gh release upload screenshots "$NAME"
+          gh issue comment "${{ github.event.issue.number }}" --body "![screenshot](https://github.com/${{ github.repository }}/releases/download/screenshots/$NAME)"
+          gh issue close "${{ github.event.issue.number }}"
