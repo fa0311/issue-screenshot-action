@@ -1,0 +1,13 @@
+{
+  "name": "x-com-actions-screenshot",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node main.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^24.7.2"
+  }
+}

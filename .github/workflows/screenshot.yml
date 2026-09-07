@@ -1,0 +1,39 @@
+name: screenshot
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: npm install
+
+      - run: node main.mjs
+        env:
+          TARGET_URL: ${{ github.event.issue.title }}
+
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p screenshots
+          cp screenshot.png "screenshots/${{ github.event.issue.number }}.png"
+          git add screenshots
+          git commit -m "Add screenshot for #${{ github.event.issue.number }}"
+          git pull --rebase origin main
+          git push origin main
+
+      - run: gh issue comment "${{ github.event.issue.number }}" --body "![screenshot](https://raw.githubusercontent.com/${{ github.repository }}/main/screenshots/${{ github.event.issue.number }}.png)"
+        env:
+          GH_TOKEN: ${{ github.token }}
