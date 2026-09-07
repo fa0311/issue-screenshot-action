@@ -29,4 +29,4 @@ jobs:
           ./gh_2.100.0_linux_amd64/bin/gh issue comment "${{ github.event.issue.number }}" --body "$TARGET_URL" --attach ./screenshot.png
           ./gh_2.100.0_linux_amd64/bin/gh issue close "${{ github.event.issue.number }}"
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
