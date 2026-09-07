@@ -4,13 +4,14 @@ on:
     types: [opened, reopened]
 
 permissions:
-  contents: write
   issues: write
 
 jobs:
   screenshot:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      TARGET_URL: ${{ github.event.issue.title }}
     steps:
       - uses: actions/checkout@v4
 
@@ -21,21 +22,11 @@ jobs:
       - run: npm install
 
       - run: node main.mjs
-        env:
-          TARGET_URL: ${{ github.event.issue.title }}
 
       - run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          mkdir -p screenshots
-          cp screenshot.png "screenshots/${{ github.event.issue.number }}-${{ github.run_id }}.png"
-          git add screenshots
-          git commit -m "Add screenshot for #${{ github.event.issue.number }}"
-          git pull --rebase origin main
-          git push origin main
-
-      - run: |
-          gh issue comment "${{ github.event.issue.number }}" --body "![screenshot](https://raw.githubusercontent.com/${{ github.repository }}/main/screenshots/${{ github.event.issue.number }}-${{ github.run_id }}.png)"
-          gh issue close "${{ github.event.issue.number }}"
+          wget -qO gh.tar.gz https://github.com/cli/cli/releases/download/v2.100.0/gh_2.100.0_linux_amd64.tar.gz
+          tar xf gh.tar.gz
+          ./gh_2.100.0_linux_amd64/bin/gh issue comment "${{ github.event.issue.number }}" --body "$TARGET_URL" --attach ./screenshot.png
+          ./gh_2.100.0_linux_amd64/bin/gh issue close "${{ github.event.issue.number }}"
         env:
           GH_TOKEN: ${{ github.token }}
